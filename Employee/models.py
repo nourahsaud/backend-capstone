@@ -12,7 +12,7 @@ class Employee(models.Model):
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.nam
+        return self.name
 
 class RequestEmployee(models.Model):
     Choices = (
@@ -22,7 +22,7 @@ class RequestEmployee(models.Model):
     )
     employee = models.ForeignKey(Employee,on_delete=models.CASCADE)
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE) 
-    #request_status = models.CharField(max_length=10 , choices = Choices)
+    request_status = models.CharField(max_length=10 , choices = Choices, default=Choices[2])
     
 
 

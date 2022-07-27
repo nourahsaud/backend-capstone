@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .models import Employee, Favorite, RequestEmployee
-from .serializers import EmployeesSerializer, FavoriteSerializer, RequestEmployeeSerializer, EmployeesSerializerView
+from .serializers import EmployeesSerializer, FavoriteSerializer, RequestEmployeeSerializer, EmployeesSerializerView, RequestEmployeeSerializerView
 from user.models import CompanyProfile
 
 
@@ -56,16 +56,17 @@ def getEmployee(request : Request):
 # Get Company ID Employees
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-def getCompanyEmployee(request : Request, profile_id):
+def getCompanyEmployee(request : Request):
     '''list the company's employees'''
     user:User = request.user
     if not user.is_authenticated:
         return Response({"msg" : "Not Allowed"}, status=status.HTTP_401_UNAUTHORIZED)    
-    
-    emps = Employee.objects.filter(company= profile_id)
+        
+    profile = CompanyProfile.objects.get(user=user)
+    emps = Employee.objects.filter(company= profile.id)
     dataResponse = {
         "msg" : "List of All company employees",
-        "employees" : EmployeesSerializer(instance=emps, many=True).data
+        "employees" : EmployeesSerializerView(instance=emps, many=True).data
         }
     return Response(dataResponse)
 
@@ -145,10 +146,6 @@ def add_req(request:Request, emp_id):
 
     request.data.update(company=profile.id, employee=emp.id)
 
-    if Employee.objects.filter(company=profile.id).exists() :
-        return Response({"msg" : "Not Allowed, you cannot requset your own employees"}, status=status.HTTP_401_UNAUTHORIZED)
-    
-
     new_req = RequestEmployeeSerializer(data=request.data)
     if new_req.is_valid():
         new_req.save()
@@ -165,7 +162,7 @@ def add_req(request:Request, emp_id):
 # Get Company ID Request - sent
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-def get_sent(request: Request, profile_id):
+def get_sent(request: Request):
     ''' 
     This function is to list all of the requests
     '''
@@ -174,10 +171,11 @@ def get_sent(request: Request, profile_id):
     if not user.is_authenticated:
         return Response({"msg" : "Not Allowed"}, status=status.HTTP_401_UNAUTHORIZED)
 
-    req = RequestEmployee.objects.filter(company= profile_id)
+    profile = CompanyProfile.objects.get(user=user)
+    req = RequestEmployee.objects.filter(company= profile.id)
     dataResponse = {
         "msg" : "List of employees requests",
-        "req" : RequestEmployeeSerializer(instance=req, many=True).data
+        "req" : RequestEmployeeSerializerView(instance=req, many=True).data
     }
 
     return Response(dataResponse)
@@ -185,7 +183,7 @@ def get_sent(request: Request, profile_id):
 # Get Company ID Request - recived 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-def get_received(request: Request, profile_id):
+def get_received(request: Request):
     ''' 
     This function is to list all of the requests
     '''
@@ -193,12 +191,14 @@ def get_received(request: Request, profile_id):
     user:User = request.user
     if not user.is_authenticated:
         return Response({"msg" : "Not Allowed"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    profile = CompanyProfile.objects.get(user=user)
+    req = RequestEmployee.objects.filter(employee__company= profile.id)
 
-    req = RequestEmployee.objects.filter(employee__company= profile_id)
 
     dataResponse = {
         "msg" : "List of employees requests",
-        "req" : RequestEmployeeSerializer(instance=req, many=True).data
+        "req" : RequestEmployeeSerializerView(instance=req, many=True).data
     }
 
     return Response(dataResponse)
@@ -265,8 +265,9 @@ def get_fav(request: Request, profile_id):
     user:User = request.user
     if not user.is_authenticated:
         return Response({"msg" : "Not Allowed"}, status=status.HTTP_401_UNAUTHORIZED)
-
-    fav = Favorite.objects.filter(company= profile_id)
+    
+    profile = CompanyProfile.objects.get(user=user)
+    fav = Favorite.objects.filter(company= profile.id)
     dataResponse = {
         "msg" : "List of employees requests",
         "req" : FavoriteSerializer(instance=fav, many=True).data

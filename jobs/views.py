@@ -5,7 +5,7 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from .models import Jobs
 from user.models import CompanyProfile
-from .serializers import JobsSerializer
+from .serializers import JobsSerializer, JobsSerializerView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.core import serializers
@@ -22,18 +22,19 @@ def add_job(request: Request):
     if not user.is_authenticated:
         return Response({"msg" : "Not Allowed"}, status=status.HTTP_401_UNAUTHORIZED)
 
-    profile = CompanyProfile.objects.get(user=request.user)
-    request.data.update(user=profile.id)
+    profile = CompanyProfile.objects.get(user=user)
+    request.data.update(company=profile.id)
     new_job = JobsSerializer(data=request.data)
     if new_job.is_valid():
         new_job.save()
         dataResponse = {
             "msg" : "Created Successfully",
-            "job" : new_job.data
+            "employee" : new_job.data
         }
         return Response(dataResponse)
     else:
-        dataResponse = {"msg" : "couldn't create an job!"}
+        print(new_job.errors)
+        dataResponse = {"msg" : "couldn't create an employee!"}
         return Response( dataResponse, status=status.HTTP_400_BAD_REQUEST)
 
 # Get All jobs
@@ -49,7 +50,24 @@ def get_jobs(request : Request):
     job = Jobs.objects.all()
     dataResponse = {
         "msg" : "List of all jobs",
-        "jobs" : JobsSerializer(instance=job, many=True).data
+        "jobs" : JobsSerializerView(instance=job, many=True).data
+        }
+    return Response(dataResponse)
+
+# Get Company ID Jobs
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+def getCompanyJobs(request : Request):
+    '''list the company's employees'''
+    user:User = request.user
+    if not user.is_authenticated:
+        return Response({"msg" : "Not Allowed"}, status=status.HTTP_401_UNAUTHORIZED)    
+        
+    profile = CompanyProfile.objects.get(user=user)
+    jobs = Jobs.objects.filter(company= profile.id)
+    dataResponse = {
+        "msg" : "List of All company employees",
+        "employees" : JobsSerializerView(instance=jobs, many=True).data
         }
     return Response(dataResponse)
 
@@ -58,12 +76,12 @@ def get_jobs(request : Request):
 @authentication_classes([JWTAuthentication])
 def delete_job(request: Request, job_id):
     '''
-        delete an job
+        delete an employee
     '''
     user:User = request.user
     if not user.is_authenticated:
         return Response({"msg" : "Not Allowed"}, status=status.HTTP_401_UNAUTHORIZED)
-    job = Jobs.objects.get(id=job_id)
+    job = Jobs.objects.get(id=job_id) 
     job.delete()
     return Response({"msg" : "Deleted Successfully"})
 

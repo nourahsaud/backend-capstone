@@ -33,3 +33,12 @@ class RequestEmployeeSerializer(serializers.ModelSerializer):
     class Meta :
         model = RequestEmployee
         fields = '__all__'
+
+
+class RequestEmployeeSerializerView(serializers.ModelSerializer):
+    """For Serializing Employee Requests"""
+    company = ProfileSerializer()
+    employee = EmployeesSerializer()
+    class Meta :
+        model = RequestEmployee
+        fields = '__all__'
