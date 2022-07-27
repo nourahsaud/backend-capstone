@@ -12,7 +12,7 @@ class Employee(models.Model):
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return self.nam
 
 class RequestEmployee(models.Model):
     Choices = (

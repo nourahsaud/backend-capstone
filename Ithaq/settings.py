@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'user',
     'Employee',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -51,8 +52,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
-
+CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'Ithaq.urls'
 
 TEMPLATES = [
@@ -126,7 +129,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SIMPLE_JWT = {
-    'ACESS_TOKEN_LIFETIME' : timedelta(days=30),
-    'REFRESH_TOKEN_LIFETIME' : timedelta(days=1),
-}
+SIMPLE_JWT = { 'ACCESS_TOKEN_LIFETIME': timedelta(days=1),}

@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .models import Employee, Favorite, RequestEmployee
-from .serializers import EmployeesSerializer, FavoriteSerializer, RequestEmployeeloyeeSerializer
+from .serializers import EmployeesSerializer, FavoriteSerializer, RequestEmployeeSerializer, EmployeesSerializerView
 from user.models import CompanyProfile
 
 
@@ -49,7 +49,7 @@ def getEmployee(request : Request):
     emps = Employee.objects.all()
     dataResponse = {
         "msg" : "List of all employees",
-        "employees" : EmployeesSerializer(instance=emps, many=True).data
+        "employees" : EmployeesSerializerView(instance=emps, many=True).data
         }
     return Response(dataResponse)
 
@@ -149,7 +149,7 @@ def add_req(request:Request, emp_id):
         return Response({"msg" : "Not Allowed, you cannot requset your own employees"}, status=status.HTTP_401_UNAUTHORIZED)
     
 
-    new_req = RequestEmployeeloyeeSerializer(data=request.data)
+    new_req = RequestEmployeeSerializer(data=request.data)
     if new_req.is_valid():
         new_req.save()
         dataResponse = {
@@ -177,7 +177,7 @@ def get_sent(request: Request, profile_id):
     req = RequestEmployee.objects.filter(company= profile_id)
     dataResponse = {
         "msg" : "List of employees requests",
-        "req" : RequestEmployeeloyeeSerializer(instance=req, many=True).data
+        "req" : RequestEmployeeSerializer(instance=req, many=True).data
     }
 
     return Response(dataResponse)
@@ -198,7 +198,7 @@ def get_received(request: Request, profile_id):
 
     dataResponse = {
         "msg" : "List of employees requests",
-        "req" : RequestEmployeeloyeeSerializer(instance=req, many=True).data
+        "req" : RequestEmployeeSerializer(instance=req, many=True).data
     }
 
     return Response(dataResponse)
@@ -217,6 +217,8 @@ def delete_req(request: Request, req_id):
     req.delete()
 
     return Response({"msg" : "Deleted Successfully"})
+
+# _______________________________________________________
 
 # Add Fav 
 @api_view(['POST'])
