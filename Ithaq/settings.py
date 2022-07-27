@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'user',
     'Employee',
     "corsheaders",
+    'jobs',
 ]
 
 MIDDLEWARE = [
