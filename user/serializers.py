@@ -9,14 +9,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password']
 
 
-# class ProfileSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = CompanyProfile
-#         fields = ['name', 'avatar', 'bio']
-
-
-# class UserInfoSerializer(serializers.ModelSerializer):
-#     profile=ProfileSerializer()
-#     class Meta:
-#         model = User
-#         fields = ['username', 'email','profile']
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyProfile
+        fields = ['name', 'avatar', 'bio']

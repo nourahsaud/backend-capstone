@@ -6,5 +6,5 @@ app_name = "user"
 urlpatterns = [
     path("login", views.Login, name="login"),
     path("register", views.Register, name="register"),
-    # path("info", views.CompanyInfo, name="companyInfo"),
+    path("info/<profile_id>", views.CompanyInfo, name="companyInfo"),
 ]
