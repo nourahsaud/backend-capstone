@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'user',
+    'Employee',
 ]
 
 MIDDLEWARE = [
@@ -125,7 +126,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SSIMPLE_JWT = {
+SIMPLE_JWT = {
     'ACESS_TOKEN_LIFETIME' : timedelta(days=30),
     'REFRESH_TOKEN_LIFETIME' : timedelta(days=1),
 }

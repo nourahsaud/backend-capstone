@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from .models import CompanyProfile 
 from django.contrib.auth.models import User
-from .serializers import UserInfoSerializer, UserRegisterSerializer
+from .serializers import UserRegisterSerializer
 
 
 @api_view(['POST'])
